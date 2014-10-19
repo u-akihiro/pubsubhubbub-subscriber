@@ -32,6 +32,10 @@ class Callback
         $feed          = file_get_contents('php://input');
         $digest        = hash_hmac('sha1', $feed, $this->secret);
         $hub_signature = explode('=', $this->headers('X-Hub-Signature'))[1];
+
+        $logger = new Logger('debug.log');
+        $logger->log('$digest: '. $digest);
+        $logger->log('$hub_signature' . $hub_signature);
         if ($digest === $hub_signature) {
           $this->has = true;
           $this->feed = $feed;
@@ -90,9 +94,35 @@ class Callback
 
   // 指定された名前のヘッダーの値を返す
   // 存在しない場合はnull
-  private function headers()
+  private function headers($key)
   {
-    $headers = getallheaders($key);
+    $headers = getallheaders();
     return array_key_exists($key, $headers) ? $headers[$key] : null;
+  }
+}
+
+class Logger
+{
+  private $name;
+  private $mode;
+
+  public function __construct($name, $mode = 'a')
+  {
+    $this->name = $name;
+    $this->mode = $mode;
+    $this->fp = fopen($name, $mode);
+  }
+
+  public function __destruct()
+  {
+    fclose($this->fp);
+  }
+
+  public function log($message = null)
+  {
+    if (!is_null($message)) {
+      $message = $message . PHP_EOL;
+      fwrite($this->fp, $message);
+    }
   }
 }
