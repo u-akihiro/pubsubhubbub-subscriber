@@ -33,9 +33,6 @@ class Callback
         $digest        = hash_hmac('sha1', $feed, $this->secret);
         $hub_signature = explode('=', $this->headers('X-Hub-Signature'))[1];
 
-        $logger = new Logger('debug.log');
-        $logger->log('$digest: '. $digest);
-        $logger->log('$hub_signature' . $hub_signature);
         if ($digest === $hub_signature) {
           $this->has = true;
           $this->feed = $feed;
