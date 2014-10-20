@@ -2,7 +2,6 @@
 
 class FeedTable
 {
-  const SELECT = 'SELECT * FROM feed;';
   private $dbh;
 
   public function __construct($dbh)
